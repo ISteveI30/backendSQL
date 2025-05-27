@@ -11,14 +11,13 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 # --- Configuraciones ---
 app = Flask(__name__)
-#CORS(app, origins=["https://sqlineage.netlify.app"], supports_credentials=True)
 CORS(app, resources={r"/api/*": {"origins": "https://sqlineage.netlify.app"}}, supports_credentials=True)
 
 @app.after_request
 def after_request(response):
-    response.headers.add("Access-Control-Allow-Origin", "https://sqlineage.netlify.app")
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-    response.headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+    response.headers["Access-Control-Allow-Origin"] = "https://sqlineage.netlify.app"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
+    response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
     return response
 
 # Configuraciones del entorno
@@ -155,6 +154,10 @@ def organizar_linaje(consultas):
     return linaje
 
 # --- Rutas API ---
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({"message": "Backend activo"}), 200
+
 @app.route('/api/tag_sql', methods=['PUT'])
 def tag_sql():
     sql_code = request.json.get('query', '')
