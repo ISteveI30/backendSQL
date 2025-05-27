@@ -11,8 +11,7 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 # --- Configuraciones ---
 app = Flask(__name__)
-#CORS(app, resources={r"/api/*": {"origins": "https://sqlineage.netlify.app"}}, supports_credentials=True)
-CORS(app, resources={r"/api/*": {"origins": "https://frontend-sql.vercel.app"}}, supports_credentials=True)
+CORS(app, resources={r"/api/*": {"origins": ["https://frontend-sql.vercel.app"]}}, supports_credentials=True)
 
 
 
@@ -169,6 +168,7 @@ def tag_sql():
         resultado = organizar_linaje(consultas)
         return jsonify({"mensaje": "Linaje generado", "resultado": {"linaje": resultado}})
     except Exception as e:
+        print("ERROR:", str(e))  # Esto aparecerá en los logs de Render
         return jsonify({"error": str(e)}), 500
 
 
