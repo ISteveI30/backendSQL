@@ -147,10 +147,6 @@ def organizar_linaje(consultas):
     return linaje
 
 # --- Rutas API ---
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({"message": "Servidor operativo"}), 200
-
 @app.route('/api/tag_sql', methods=['PUT'])
 def tag_sql():
     sql_code = request.json.get('query', '')
