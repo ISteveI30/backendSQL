@@ -12,17 +12,9 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 # --- Configuraciones ---
 app = Flask(__name__)
 #CORS(app, resources={r"/api/*": {"origins": "https://sqlineage.netlify.app"}}, supports_credentials=True)
-CORS(app, origins=["https://frontend-sql.vercel.app"], supports_credentials=True)
+CORS(app, resources={r"/api/*": {"origins": "https://frontend-sql.vercel.app"}}, supports_credentials=True)
 
-@app.after_request
-def after_request(response):
-    origin = request.headers.get('Origin')
-    if origin == "https://frontend-sql.vercel.app":
-        response.headers.add("Access-Control-Allow-Origin", origin)
-    response.headers.add("Access-Control-Allow-Credentials", "true")
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type,Authorization")
-    response.headers.add("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
-    return response
+
 
 # Configuraciones del entorno
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
@@ -162,12 +154,23 @@ def organizar_linaje(consultas):
 def home():
     return jsonify({"message": "Backend activo"}), 200
 
+#@app.route('/api/tag_sql', methods=['PUT'])
+#def tag_sql():
+#    sql_code = request.json.get('query', '')
+#    consultas = dividir_consultas(sql_code)
+#    resultado = organizar_linaje(consultas)
+#    return jsonify({"mensaje": "Linaje generado", "resultado": {"linaje": resultado}})
+
 @app.route('/api/tag_sql', methods=['PUT'])
 def tag_sql():
-    sql_code = request.json.get('query', '')
-    consultas = dividir_consultas(sql_code)
-    resultado = organizar_linaje(consultas)
-    return jsonify({"mensaje": "Linaje generado", "resultado": {"linaje": resultado}})
+    try:
+        sql_code = request.json.get('query', '')
+        consultas = dividir_consultas(sql_code)
+        resultado = organizar_linaje(consultas)
+        return jsonify({"mensaje": "Linaje generado", "resultado": {"linaje": resultado}})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/api/get_sql', methods=['GET'])
 def get_sql():
