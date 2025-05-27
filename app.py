@@ -154,6 +154,10 @@ def organizar_linaje(consultas):
     return linaje
 
 # --- Rutas API ---
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({"message": "Backend SQL está funcionando correctamente"}), 200
+    
 @app.route('/api/tag_sql', methods=['PUT'])
 def tag_sql():
     sql_code = request.json.get('query', '')
@@ -165,6 +169,7 @@ def tag_sql():
 def get_sql():
     return jsonify({"mensaje": "No hay linaje disponible"}), 404
 
+# --- Registro ---
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.get_json() or {}
@@ -188,6 +193,7 @@ def register():
     db.session.commit()
     return jsonify({"message": "Usuario registrado correctamente"}), 201
 
+# --- Login con JWT ---
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json() or {}
@@ -200,34 +206,11 @@ def login():
     if not check_password_hash(user.password, password):
         return jsonify({"message": "Contraseña incorrecta"}), 401
 
-    return jsonify({
-        "message": "Login exitoso",
-        "user_id": user.id,
-        "username": user.username
-    }), 200
+    payload = {"user_id": user.id, "username": user.username}
+    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
+    return jsonify({"message": "Login exitoso", "token": token}), 200
 
-
-#@app.route('/api/login', methods=['POST'])
-#def login():
-#    data = request.get_json() or {}
-#    email, password = data.get('email'), data.get('password')
-#    user = User.query.filter_by(email=email).first()
-#
-#    if not user:
-#        return jsonify({"message": "Correo invalido"}), 404
-#
-#    if not check_password_hash(user.password, password):
-#        return jsonify({"message": "Contraseña incorrecta"}), 401
-#
-#    payload = {"user_id": user.id, "username": user.username}
-#    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-#    return jsonify({"message": "Login exitoso", "token": token}), 200
-#
-
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({"message": "Backend SQL está funcionando correctamente"}), 200
-
+# --- Historial ---
 @app.route('/api/historial', methods=['POST'])
 def guardar_historial():
     data = request.get_json() or {}
@@ -272,6 +255,7 @@ def editar_historial(id):
     historial.nombre = nuevo_nombre
     db.session.commit()
     return jsonify({'message': 'Nombre del historial actualizado correctamente'}), 200
+
 
 if __name__ == '__main__':
     #app.run(debug=True)
