@@ -11,7 +11,7 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 # --- Configuraciones ---
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={r"/api/*": {"origins": "https://sqlineage.netlify.app"}}, supports_credentials=True)
 
 @app.after_request
 def after_request(response):
@@ -154,9 +154,6 @@ def organizar_linaje(consultas):
     return linaje
 
 # --- Rutas API ---
-@app.route('/', methods=['GET'])
-def index():
-    return jsonify({"message": "Backend SQL está funcionando correctamente"}), 200
     
 @app.route('/api/tag_sql', methods=['PUT'])
 def tag_sql():
