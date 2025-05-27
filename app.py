@@ -11,14 +11,7 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 # --- Configuraciones ---
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "https://sqlineage.netlify.app"}}, supports_credentials=True)
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'https://sqlineage.netlify.app')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
-    return response
+CORS(app, origins=["https://sqlineage.netlify.app"], supports_credentials=True)
 
 # Configuraciones del entorno
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///users.db')
@@ -154,7 +147,10 @@ def organizar_linaje(consultas):
     return linaje
 
 # --- Rutas API ---
-    
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({"message": "Servidor operativo"}), 200
+
 @app.route('/api/tag_sql', methods=['PUT'])
 def tag_sql():
     sql_code = request.json.get('query', '')
@@ -166,7 +162,6 @@ def tag_sql():
 def get_sql():
     return jsonify({"mensaje": "No hay linaje disponible"}), 404
 
-# --- Registro ---
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.get_json() or {}
@@ -190,7 +185,6 @@ def register():
     db.session.commit()
     return jsonify({"message": "Usuario registrado correctamente"}), 201
 
-# --- Login con JWT ---
 @app.route('/api/login', methods=['POST'])
 def login():
     data = request.get_json() or {}
@@ -203,11 +197,12 @@ def login():
     if not check_password_hash(user.password, password):
         return jsonify({"message": "Contraseña incorrecta"}), 401
 
-    payload = {"user_id": user.id, "username": user.username}
-    token = jwt.encode(payload, SECRET_KEY, algorithm='HS256')
-    return jsonify({"message": "Login exitoso", "token": token}), 200
+    return jsonify({
+        "message": "Login exitoso",
+        "user_id": user.id,
+        "username": user.username
+    }), 200
 
-# --- Historial ---
 @app.route('/api/historial', methods=['POST'])
 def guardar_historial():
     data = request.get_json() or {}
@@ -252,7 +247,6 @@ def editar_historial(id):
     historial.nombre = nuevo_nombre
     db.session.commit()
     return jsonify({'message': 'Nombre del historial actualizado correctamente'}), 200
-
 
 if __name__ == '__main__':
     #app.run(debug=True)
