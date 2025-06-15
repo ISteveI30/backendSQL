@@ -153,13 +153,6 @@ def organizar_linaje(consultas):
 def home():
     return jsonify({"message": "Backend activo"}), 200
 
-#@app.route('/api/tag_sql', methods=['PUT'])
-#def tag_sql():
-#    sql_code = request.json.get('query', '')
-#    consultas = dividir_consultas(sql_code)
-#    resultado = organizar_linaje(consultas)
-#    return jsonify({"mensaje": "Linaje generado", "resultado": {"linaje": resultado}})
-
 @app.route('/api/tag_sql', methods=['PUT'])
 def tag_sql():
     try:
@@ -221,9 +214,13 @@ def login():
 def guardar_historial():
     data = request.get_json() or {}
     nombre, linaje, user_id = data.get("nombre"), data.get("linaje"), data.get("user_id")
+    
     if not all([nombre, linaje, user_id]):
         return jsonify({"message": "Nombre, linaje y usuario son requeridos"}), 400
 
+    if not linaje.get("linaje"):
+        return jsonify({"message": "No se puede guardar un linaje vacío"}), 400
+    
     nuevo_historial = Historial(nombre=nombre, fecha=datetime.now(), tables=linaje, columns=linaje, user_id=user_id)
     db.session.add(nuevo_historial)
     db.session.commit()
