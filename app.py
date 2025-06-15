@@ -11,7 +11,7 @@ from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 # --- Configuraciones ---
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": ["https://frontend-sql-git-main-brajans-projects-989cf59e.vercel.app"]}}, supports_credentials=True)
+CORS(app, resources={r"/api/*": {"origins": ["https://frontend-6kg52omk9-brajans-projects-989cf59e.vercel.app"]}}, supports_credentials=True)
 
 
 
