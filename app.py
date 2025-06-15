@@ -133,9 +133,9 @@ def organizar_linaje(consultas):
         elif 'SELECT' in consulta.upper() and 'INTO' in consulta.upper():
             linaje.append({
                 'source_tables': src_tabs,
-                'source_columns': ['Todas las columnas'],
+                'source_columns': src_cols or ['Todas las columnas'],
                 'target_table': tgt_tabs[0] if tgt_tabs else '',
-                'target_columns': ['Todas las columnas']
+                'target_columns': tgt_cols or src_cols or ['Todas las columnas']
             })
         elif 'JOIN' in consulta.upper():
             for src in src_tabs:
